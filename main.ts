@@ -21,5 +21,10 @@ import { join } from 'node:path';
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 const entryPath = new URL('./entry.txt', import.meta.url);
 const entry = readFileSync(entryPath, 'utf8');
+// The gate takes UTF-8 text of 1 to 280 characters: fail loudly here
+// rather than shipping an entry the gate would refuse.
+if (entry.length < 1 || entry.length > 280) {
+  throw new Error(`entry is ${entry.length} characters, outside the 1-280 gate`);
+}
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'entry.txt'), entry);
